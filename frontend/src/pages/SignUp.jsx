@@ -63,7 +63,6 @@ function SignUp() {
         dispatch(
           loginSuccess({
             user: res.data.user,
-            token: res.data.token,
           })
         );
       }
@@ -74,12 +73,9 @@ function SignUp() {
         error.response?.data?.message ||
         error.message ||
         "Something went wrong";
+      dispatch(loginFailure(message));
       showTost("error", message);
     }
-    console.log(
-      "API URL:",
-      `${import.meta.env.VITE_API_BASE_URL}/auth/register`
-    );
   }
 
   return (

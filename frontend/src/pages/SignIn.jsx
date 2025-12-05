@@ -19,6 +19,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { showTost } from "@/utils/showTost";
 import axios from "axios";
 import GoogleLogin from "@/components/GoogleLogin";
+import { useDispatch } from "react-redux";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -27,6 +28,7 @@ const formSchema = z.object({
 
 function SignIn() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,6 +38,7 @@ function SignIn() {
   });
   async function onSubmit(values) {
     try {
+      dispatch(loginStart());
       const res = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
         values,
@@ -46,6 +49,11 @@ function SignIn() {
           },
         }
       );
+      dispatch(
+        loginSuccess({
+          user: res.data.user,
+        })
+      );
 
       navigate(RouteIndex);
       showTost("succes", res.data.message);
@@ -54,6 +62,7 @@ function SignIn() {
         error.response?.data?.message ||
         error.message ||
         "Something went wrong";
+        dispatch(loginFailure(message));
       showTost("error", message);
     }
   }
